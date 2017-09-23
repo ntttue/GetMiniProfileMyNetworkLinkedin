@@ -1,4 +1,5 @@
 # Get mini profile of my network in Linkedin
+
 1 - login : https://www.linkedin.com 
 2 - Go to: https://www.linkedin.com/mynetwork/invite-connect/connections/
 3 - Choose 3.1 or 3.2 (only one):
