@@ -81,6 +81,7 @@ function main() {
                     "\"" + emp.miniProfile.firstName + "\"",
                     "\"" + emp.miniProfile.lastName + "\"",
                     "\"" + emp.miniProfile.occupation + "\"",
+                    "\"" + emp.miniProfile.publicIdentifier + "\"",
                     "\"" + "https://www.linkedin.com/in/" + encodeURI(emp.miniProfile.publicIdentifier) + "\""
                 ]);
             })

@@ -35,6 +35,7 @@ function getCookie(name) {
 }
 
 var csrfToken = getCookie('JSESSIONID');
+console.log(csrfToken)
 
 // send POST pdf profile
 function POSTRequest(idProfile) {
@@ -49,6 +50,7 @@ function POSTRequest(idProfile) {
         }
     };
     xhttp.open("POST", linkRequest, true);
+    xhttp.setRequestHeader("Authorization", "Bearer AQXTFNaLB5yxXNHajUhNq9-2lhU0ShnvvHiXX9_mrPKMkRfQCfwOaYNzBbEFk07nfOodQueFcyhqsFuxpuyPg_H4dk3XUDWjLxnbXW4b0_1hJCbJBUO3A7hh_6AolXbaI9bOzatGRylLq1oeQQjOLupcMe-BZVIVA5qySl6DI_zU7OlW8gV3z7nQvLoufiuyzk6fUzcCVoTg2Hg9owZ09I1IW4iYtft6G2z4A8vDsdG3Ow9yFWZcx3uVJAqkgM8yQfct6oD400ba1cq-OgRLSIyOQBLewpjxUg5Ul70q2QyT88SK53ad9hdtzP1Ox2-mra57pEj7JnYKdr90RgH26tDemPQc3A");
     xhttp.setRequestHeader("csrf-token", csrfToken);
     xhttp.send();
 }

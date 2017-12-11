@@ -35,6 +35,7 @@ function getCookie(name) {
 }
 
 var csrfToken = getCookie('JSESSIONID');
+console.log(csrfToken)
 
 // send POST pdf profile
 function POSTRequest(idProfile) {
