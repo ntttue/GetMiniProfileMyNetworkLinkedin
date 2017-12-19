@@ -10,25 +10,25 @@ function getCookie(name) {
 
 var csrfToken = getCookie('JSESSIONID');
 var profileIDCallSS = [];
+var indexInput = 0;
 
 function getSkill(profileID) {
     return new Promise(resolve => {
-        var linkGetSkill = "https://www.linkedin.com/voyager/api/identity/profiles/" + profileID + "/featuredSkills?includeHiddenEndorsers=true&count=50";
-        var req = new XMLHttpRequest();
+        setTimeout(() => {
+            var linkGetSkill = "https://www.linkedin.com/voyager/api/identity/profiles/" + profileID + "/featuredSkills?includeHiddenEndorsers=true&count=50";
+            var req = new XMLHttpRequest();
 
-        function reqListener() {
-            if (req.readyState === 4 && req.status === 200) {
-                resolve(JSON.parse(this.responseText));
-                profileIDCallSS.push(profileID);
+            function reqListener() {
+                if (req.readyState === 4 && req.status === 200) {
+                    resolve(JSON.parse(this.responseText));
+                }
             }
-        }
 
-        req.addEventListener("load", reqListener);
-        req.open("GET", linkGetSkill, true);
-        req.setRequestHeader("csrf-token", csrfToken);
-        setTimeout(function () {
+            req.addEventListener("load", reqListener);
+            req.open("GET", linkGetSkill, true);
+            req.setRequestHeader("csrf-token", csrfToken);
             req.send();
-        }, 5000);
+        }, 1000);
     });
 }
 
@@ -56,15 +56,18 @@ function exportFile(data, filename) {
     a.dispatchEvent(e)
 }
 
-function main() {
+async function main() {
     var promises = [];
     var empConnects = [];
     profileId.forEach(function (profile) {
         promises.push(getSkill(profile));
+        profileIDCallSS.push(profile);
     });
-    Promise.all(promises).then(dataResponse => {
+    await Promise.all(promises).then(dataResponse => {
         dataResponse.forEach(function (value, index) {
+            console.log(profileIDCallSS);
             var stringInput = "\"" + profileIDCallSS[index] + "\"" + "\,";
+            console.log(index + " - " + profileIDCallSS[index]);
             var skillStr = "";
             if ((dataResponse.length) === (profileIDCallSS.length)) {
                 value.elements.forEach(function (skill) {

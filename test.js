@@ -20,3 +20,13 @@ function mapping() {
     useAPI(1, 'Nhan');
     useAPI(2, 'Tue');
 }
+
+async function getDataAsync() {
+    var result = [];
+    var a = await getLinkedInConnections(csrfToken, 0, 40);
+    result.push(a);
+    var b = await getLinkedInConnections(csrfToken, 40, 40);
+    result.push(b);
+    return result;
+}
+getDataAsync().then(result=>{console.log(result)});
