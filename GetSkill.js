@@ -1,6 +1,6 @@
 // send POST pdf profile
 
-var profileId = ["mai-le-88057835", "huyns"];
+var profileId = ["huyns", "andytranhr", "angiestrahle", "kiettran2502", "anh-mai-vu-ba0a9488", "an-le-5ab37956"];
 
 function getCookie(name) {
     var value = "; " + document.cookie;
@@ -13,23 +13,22 @@ var profileIDCallSS = [];
 
 function getSkill(profileID) {
     return new Promise(resolve => {
-        setTimeout(function () {
-            var linkGetSkill = "https://www.linkedin.com/voyager/api/identity/profiles/" + profileID + "/featuredSkills?includeHiddenEndorsers=true&count=50";
-            var req = new XMLHttpRequest();
+        var linkGetSkill = "https://www.linkedin.com/voyager/api/identity/profiles/" + profileID + "/featuredSkills?includeHiddenEndorsers=true&count=50";
+        var req = new XMLHttpRequest();
 
-            function reqListener() {
-                if (req.readyState === 4 && req.status === 200) {
-                    resolve(JSON.parse(this.responseText));
-                    console.log(profileID);
-                    profileIDCallSS.push(profileID);
-                }
+        function reqListener() {
+            if (req.readyState === 4 && req.status === 200) {
+                resolve(JSON.parse(this.responseText));
+                profileIDCallSS.push(profileID);
             }
+        }
 
-            req.addEventListener("load", reqListener);
-            req.open("GET", linkGetSkill, true);
-            req.setRequestHeader("csrf-token", csrfToken);
+        req.addEventListener("load", reqListener);
+        req.open("GET", linkGetSkill, true);
+        req.setRequestHeader("csrf-token", csrfToken);
+        setTimeout(function () {
             req.send();
-        }, 1000);
+        }, 5000);
     });
 }
 
@@ -74,7 +73,6 @@ function main() {
                 });
                 stringInput += skillStr;
                 empConnects.push([stringInput]);
-                console.log(empConnects);
             } else {
                 console.log("not equals");
             }
