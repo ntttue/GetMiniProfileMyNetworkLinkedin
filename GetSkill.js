@@ -1,6 +1,6 @@
 // send POST pdf profile
 
-var profileId = ["huyns", "andytranhr", "angiestrahle", "kiettran2502", "tran-nga-563b9615", "thuy-nguyen-thu-74158022", "chau-ky-khanh-2a190a25", "joseph-phuc-phan-9a9a6212", "hung-tran-a599382a", "pham-huy-14b59031", "haovp", "vinh-pham-phu-7617112b"];
+var profileId = ["huyns", "andytranhr", "tran-nga-563b9615", "angiestrahle", "kiettran2502", "thuy-nguyen-thu-74158022", "chau-ky-khanh-2a190a25", "joseph-phuc-phan-9a9a6212", "hung-tran-a599382a", "pham-huy-14b59031", "haovp", "vinh-pham-phu-7617112b"];
 
 function removeA(arr) {
     var what, a = arguments, L = a.length, ax;
@@ -24,7 +24,7 @@ var profileIDCallSS = [];
 var profileFailed = [];
 
 function getSkill(profileID) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         setTimeout(() => {
             var linkGetSkill = "https://www.linkedin.com/voyager/api/identity/profiles/" + profileID + "/featuredSkills?includeHiddenEndorsers=true&count=50";
             var req = new XMLHttpRequest();
@@ -33,12 +33,8 @@ function getSkill(profileID) {
                 if (req.readyState === 4 && req.status === 200) {
                     resolve(JSON.parse(this.responseText));
                 } else {
-                    var index = profileIDCallSS.indexOf(profileID);
-                    console.log("Fail: " + profileID);
-                    if (index > -1) {
-                        removeA(profileIDCallSS, profileID);
-                    }
                     profileFailed.push(profileID);
+                    return reject(null)
                 }
             }
 
@@ -47,6 +43,9 @@ function getSkill(profileID) {
             req.setRequestHeader("csrf-token", csrfToken);
             req.send();
         }, 1000);
+    }).catch(function (err) {
+        //return error;
+        return err;
     });
 }
 
@@ -74,31 +73,33 @@ function exportFile(data, filename) {
     a.dispatchEvent(e)
 }
 
-
-async function main() {
+function main() {
     var promises = [];
     var empConnects = [];
+    var urlsCall = [];
     profileId.forEach(function (profile) {
-        promises.push(getSkill(profile));
-        profileIDCallSS.push(profile);
+        urlsCall.push(profile);
     });
-    await Promise.all(promises).then(dataResponse => {
-        dataResponse.forEach(function (value, index) {
-            console.log("Failed : " + profileFailed.length);
-            var stringInput = "\"" + profileIDCallSS[index] + "\"" + "\,";
-            console.log(index + " - " + profileIDCallSS[index]);
+    Promise.all(urlsCall.map(getSkill)).then(dataResponse => {
+        console.log(dataResponse);
+        for (var index in dataResponse) {
+            if (index >= urlsCall.length) {
+                break;
+            }
+            var stringInput = "\"" + urlsCall[index] + "\"" + "\,";
             var skillStr = "";
-            if ((dataResponse.length) === (profileIDCallSS.length)) {
-                value.elements.forEach(function (skill) {
+            if (dataResponse[index] !== null) {
+                dataResponse[index].elements.forEach(function (skill) {
+                    console.log(skill);
                     skillStr += "\"" + skill.skill.name + "\"" + "\," + "\"" + skill.endorsementCount + "\"" + "\,";
                 });
-                stringInput += skillStr;
-                empConnects.push([stringInput]);
             } else {
-                console.log("not equals");
+                console.log("else");
+                skillStr = "\,";
             }
-        });
-
+            stringInput += skillStr;
+            empConnects.push([stringInput]);
+        }
         if (empConnects.length < 1) {
             console.log("no data");
             return;
@@ -110,10 +111,10 @@ async function main() {
             csvContent += index < empConnects.length ? dataString : dataString;
             csvContent += "\n";
         });
-
         exportFile(csvContent, "skill.csv");
-    }).catch(reason => {
-        console.log(reason);
+    }).catch(function (rej) {
+        //here when you reject the promise
+        console.log(rej);
     });
 }
 
