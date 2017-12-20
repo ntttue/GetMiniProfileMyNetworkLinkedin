@@ -1,6 +1,17 @@
 // send POST pdf profile
 
-var profileId = ["huyns", "andytranhr", "angiestrahle", "kiettran2502", "anh-mai-vu-ba0a9488", "an-le-5ab37956"];
+var profileId = ["huyns", "andytranhr", "angiestrahle", "kiettran2502", "tran-nga-563b9615", "thuy-nguyen-thu-74158022", "chau-ky-khanh-2a190a25", "joseph-phuc-phan-9a9a6212", "hung-tran-a599382a", "pham-huy-14b59031", "haovp", "vinh-pham-phu-7617112b"];
+
+function removeA(arr) {
+    var what, a = arguments, L = a.length, ax;
+    while (L > 1 && arr.length) {
+        what = a[--L];
+        while ((ax = arr.indexOf(what)) !== -1) {
+            arr.splice(ax, 1);
+        }
+    }
+    return arr;
+}
 
 function getCookie(name) {
     var value = "; " + document.cookie;
@@ -10,7 +21,7 @@ function getCookie(name) {
 
 var csrfToken = getCookie('JSESSIONID');
 var profileIDCallSS = [];
-var indexInput = 0;
+var profileFailed = [];
 
 function getSkill(profileID) {
     return new Promise(resolve => {
@@ -21,6 +32,13 @@ function getSkill(profileID) {
             function reqListener() {
                 if (req.readyState === 4 && req.status === 200) {
                     resolve(JSON.parse(this.responseText));
+                } else {
+                    var index = profileIDCallSS.indexOf(profileID);
+                    console.log("Fail: " + profileID);
+                    if (index > -1) {
+                        removeA(profileIDCallSS, profileID);
+                    }
+                    profileFailed.push(profileID);
                 }
             }
 
@@ -56,6 +74,7 @@ function exportFile(data, filename) {
     a.dispatchEvent(e)
 }
 
+
 async function main() {
     var promises = [];
     var empConnects = [];
@@ -65,14 +84,13 @@ async function main() {
     });
     await Promise.all(promises).then(dataResponse => {
         dataResponse.forEach(function (value, index) {
-            console.log(profileIDCallSS);
+            console.log("Failed : " + profileFailed.length);
             var stringInput = "\"" + profileIDCallSS[index] + "\"" + "\,";
             console.log(index + " - " + profileIDCallSS[index]);
             var skillStr = "";
             if ((dataResponse.length) === (profileIDCallSS.length)) {
                 value.elements.forEach(function (skill) {
                     skillStr += "\"" + skill.skill.name + "\"" + "\," + "\"" + skill.endorsementCount + "\"" + "\,";
-
                 });
                 stringInput += skillStr;
                 empConnects.push([stringInput]);
@@ -94,6 +112,8 @@ async function main() {
         });
 
         exportFile(csvContent, "skill.csv");
+    }).catch(reason => {
+        console.log(reason);
     });
 }
 
